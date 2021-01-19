@@ -19,7 +19,7 @@ class EmojiMemoryGame: ObservableObject {
         ]
         // Use randomly selected emoji set
         let emojis = emojiSets[Int.random(in: 0..<emojiSets.count)]
-        return  MemoryGame<String>(numberOfPairsOfCards: Int.random(in: 2...5)) { pairIndex in
+        return  MemoryGame<String>(numberOfPairsOfCards: 3) { pairIndex in
             return emojis[pairIndex]
         }
     }
@@ -31,6 +31,6 @@ class EmojiMemoryGame: ObservableObject {
     
     // MARK: - Intent(s) 
     func choose(card: MemoryGame<String>.Card) {
-        model.choose( card)
+        model.choose(card)
     }
 }
