@@ -19,23 +19,7 @@ struct Grid<Item, ItemView>: View where Item: Identifiable, ItemView: View {
     var body: some View {
         GeometryReader { geometry in
             let layout = GridLayout(itemCount: items.count, in: geometry.size)
-            
             body(for: layout)
-            
-            
-            
-            
-            
-//            ForEach(items) { item in
-//                let indexOptional = items.firstIndex { tempItem in
-//                    tempItem.id == item.id
-//                }
-//                guard let index = indexOptional else { return}
-//
-//                return viewForItem(item)
-//                    .frame(width: layout.itemSize.width, height: layout.itemSize.height)
-//                    .position(layout.location(ofItemAt: index))
-//            }
         }
     }
     
@@ -46,9 +30,12 @@ struct Grid<Item, ItemView>: View where Item: Identifiable, ItemView: View {
     }
     
     func body(for item: Item, in layout: GridLayout) -> some View {
-        let index = items.firstIndex(matching: item)
-        return viewForItem(item)
-                        .frame(width: layout.itemSize.width, height: layout.itemSize.height)
-                        .position(layout.location(ofItemAt: index))
+        Group {
+            if let index = items.firstIndex(matching: item) {
+                viewForItem(item)
+                    .frame(width: layout.itemSize.width, height: layout.itemSize.height)
+                    .position(layout.location(ofItemAt: index))
+            }
+        }
     }
 }

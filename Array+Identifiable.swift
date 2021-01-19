@@ -8,15 +8,10 @@
 import Foundation
 
 extension Array where Element: Identifiable {
-//    let indexOptional = items.firstIndex { tempItem in
-//        tempItem.id == item.id
-//    }
-    func firstIndex(matching: Element) -> Int {
-        for index in 0..<count {
-            if self[index].id == matching.id {
-                return index
-            }
+    func firstIndex(matching: Element) -> Int? {
+        return firstIndex { item in
+            item.id == matching.id
         }
-        return 0
     }
 }
+ 
