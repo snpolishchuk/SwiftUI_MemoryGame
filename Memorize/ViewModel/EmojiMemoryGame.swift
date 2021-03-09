@@ -10,7 +10,8 @@ import Foundation
 // ViewModel
 class EmojiMemoryGame: ObservableObject {
     @Published private var model: MemoryGame<String> = createMemoryGame()
-    
+    private static var currentTheme: GameTheme!
+
     static let gameThemes = [
         GameTheme(name: .faces, numberOfPairsOfCards: 2),
         GameTheme(name: .trees, numberOfPairsOfCards: 3),
@@ -23,6 +24,7 @@ class EmojiMemoryGame: ObservableObject {
     static func createMemoryGame() -> MemoryGame<String> {
         // Use randomly selected gameTheme
         let gameTheme = gameThemes[Int.random(in: 0..<gameThemes.count)]
+        currentTheme = gameTheme
         
         return MemoryGame<String>(numberOfPairsOfCards: gameTheme.numberOfPairsOfCards) { pairIndex in
             return gameTheme.emojiSet[pairIndex]
@@ -34,8 +36,16 @@ class EmojiMemoryGame: ObservableObject {
         model.cards
     }
     
+    var themeName: String {
+        EmojiMemoryGame.currentTheme.name.rawValue
+    }
+        
     // MARK: - Intent(s) 
     func choose(card: MemoryGame<String>.Card) {
         model.choose(card)
+    }
+    
+    func startNewGame() {
+        model = EmojiMemoryGame.createMemoryGame()
     }
 }
