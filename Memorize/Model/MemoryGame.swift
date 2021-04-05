@@ -8,8 +8,9 @@
 import Foundation
 
 // Model
-struct MemoryGame<CardContent> where CardContent: Equatable{
+struct MemoryGame<CardContent> where CardContent: Equatable {
     var cards: [Card]
+    var score = 0
     
     var indexOfTheOneAndOnlyFaceUpCard: Int? {
         get {
@@ -24,20 +25,30 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     
     mutating func choose(_ card: Card) {
         // Choose only existing, not faced up and not matched cards
-        if let chosenIndex = cards.firstIndex(matching: card), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched {
-            // If there is already faced up card then try to match it
-            if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
-                // If content matches then match cards
-                if cards[chosenIndex].content == cards[potentialMatchIndex].content {
-                    cards[chosenIndex].isMatched = true
-                    cards[potentialMatchIndex].isMatched = true
-                }
+        guard let chosenIndex = cards.firstIndex(matching: card), !cards[chosenIndex].isFaceUp, !cards[chosenIndex].isMatched else {
+            return
+        }
+        
+        // If there is already faced up card then try to match it
+        if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
+            // If content matches then match cards
+            if cards[chosenIndex].content == cards[potentialMatchIndex].content {
+                cards[chosenIndex].isMatched = true
+                cards[potentialMatchIndex].isMatched = true
+                score += 2
             } else {
-                indexOfTheOneAndOnlyFaceUpCard = chosenIndex
+                checkAndPenalizeCard(at: chosenIndex)
+                checkAndPenalizeCard(at: potentialMatchIndex)
             }
             
-            cards[chosenIndex].isFaceUp = true
+            // Mark cards as already seen
+            cards[chosenIndex].isFirstOpening = false
+            cards[potentialMatchIndex].isFirstOpening = false
+        } else {
+            indexOfTheOneAndOnlyFaceUpCard = chosenIndex
         }
+        
+        cards[chosenIndex].isFaceUp = true
     }
     
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
@@ -53,7 +64,17 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     struct Card: Identifiable {
         var isFaceUp: Bool = false
         var isMatched: Bool = false
+        var isFirstOpening: Bool = true
         var content: CardContent
         var id: Int
+    }
+}
+
+private extension MemoryGame {
+    // If card has been already opened then penalize 1 point
+    mutating func checkAndPenalizeCard(at index: Int) {
+        if !cards[index].isFirstOpening {
+            score -= 1
+        }
     }
 }
